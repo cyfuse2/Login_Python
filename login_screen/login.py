@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import messagebox
 import logging
-import sqlite3
 import hashlib
+from pymongo import MongoClient
 from dataclasses import dataclass
 
 logging.basicConfig(
@@ -10,6 +10,13 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s',
     filename='app.log'
 )
+
+MONGODB_URI = "mongodb+srv://carlos:sYDh0xjIIIfGJO63@institutocaxingui.qipu1.mongodb.net/my_database?retryWrites=true&w=majority&appName=institutocaxingui"
+
+# Conexão com o MongoDB
+client = MongoClient(MONGODB_URI)
+db = client['institutocaxingui']
+users_collection = db.users 
 
 @dataclass
 class AppConfig:
@@ -27,50 +34,29 @@ class AppConfig:
 
 @dataclass
 class DatabaseConfig:
-    DB_NAME: str = "users.db"
-    TABLE_NAME: str = "users"
-    MIN_USERNAME_LENGTH: int = 3
-    MIN_PASSWORD_LENGTH: int = 5
+    MIN_USERNAME_LENGTH: int
+    MIN_PASSWORD_LENGTH: int
 
 class UserDB:
-    def __init__(self, config: DatabaseConfig = DatabaseConfig()):
+    def __init__(self, config: DatabaseConfig):
         self.config = config
-        self._initialize_db()
-
-    def _initialize_db(self) -> None:
-        with sqlite3.connect(self.config.DB_NAME) as conn:
-            cursor = conn.cursor()
-            cursor.execute(f'''
-                CREATE TABLE IF NOT EXISTS {self.config.TABLE_NAME} (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    username TEXT UNIQUE NOT NULL,
-                    password TEXT NOT NULL
-                )
-            ''')
-            conn.commit()
+        self.collection = users_collection  # Coleção MongoDB
 
     def register_user(self, username: str, password: str) -> tuple:
         try:
             if len(username) < self.config.MIN_USERNAME_LENGTH:
                 return (False, f"Nome de usuário muito curto (mínimo {self.config.MIN_USERNAME_LENGTH} caracteres)")
-            
             if len(password) < self.config.MIN_PASSWORD_LENGTH:
                 return (False, f"Senha muito curta (mínimo {self.config.MIN_PASSWORD_LENGTH} caracteres)")
-
+            
             hashed_password = self._hash_password(password)
             
-            with sqlite3.connect(self.config.DB_NAME) as conn:
-                cursor = conn.cursor()
-                cursor.execute(f'''
-                    INSERT INTO {self.config.TABLE_NAME} (username, password)
-                    VALUES (?, ?)
-                ''', (username, hashed_password))
-                conn.commit()
-                return (True, "Registro bem-sucedido!")
-                
-        except sqlite3.IntegrityError:
-            return (False, "Nome de usuário já está em uso")
+            if self.collection.find_one({"username": username}):
+                return (False, "Nome de usuário já está em uso")
             
+            self.collection.insert_one({"username": username, "password": hashed_password})
+            return (True, "Registro bem-sucedido!")
+        
         except Exception as e:
             logging.error(f"Erro crítico no registro: {str(e)}")
             return (False, f"Erro interno: {str(e)}")
@@ -78,14 +64,8 @@ class UserDB:
     def validate_user(self, username: str, password: str) -> bool:
         try:
             hashed_password = self._hash_password(password)
-            with sqlite3.connect(self.config.DB_NAME) as conn:
-                cursor = conn.cursor()
-                cursor.execute(f'''
-                    SELECT password FROM {self.config.TABLE_NAME}
-                    WHERE username = ?
-                ''', (username,))
-                result = cursor.fetchone()
-                return result and result[0] == hashed_password
+            user = self.collection.find_one({"username": username})
+            return user and user["password"] == hashed_password
         except Exception as e:
             logging.error(f"Erro na validação: {str(e)}")
             return False
@@ -99,19 +79,15 @@ class AuthManager:
         self.db = db
         
     def validate_credentials(self, username: str, password: str) -> bool:
-        if not self._validate_input(username, self.db.config.MIN_USERNAME_LENGTH) or \
-           not self._validate_input(password, self.db.config.MIN_PASSWORD_LENGTH):
+        if not self._validate_input(username, AppConfig.MIN_USERNAME_LENGTH) or \
+           not self._validate_input(password, AppConfig.MIN_PASSWORD_LENGTH):
             return False
         return self.db.validate_user(username, password)
     
     @staticmethod
     def _validate_input(value: str, min_length: int) -> bool:
         value = value.strip()
-        if len(value) < min_length:
-            logging.warning(f"Entrada muito curta: {value}")
-            return False
-        if any(char.isspace() for char in value):
-            logging.warning("Entrada contém espaços")
+        if len(value) < min_length or any(char.isspace() for char in value):
             return False
         return True
 
@@ -217,7 +193,7 @@ class LoginScreen:
             bg=self.config.BG_COLOR,
             fg=self.config.TEXT_COLOR,
             selectcolor=self.config.BG_COLOR
-        ).grid(row=5, column=0, columnspan=2)
+        ).grid(row=4, column=0, columnspan=2)  # Corrigido de row=5 para row=4
 
     def _bind_events(self) -> None:
         self.master.bind('<Return>', lambda event: self._handle_login())
@@ -274,28 +250,6 @@ class Cadastro(tk.Toplevel):
         self._create_widgets()
         self._bind_events()
 
-    def _realizar_registro(self, event=None):
-        try:
-            username = self.username_entry.get().strip()
-            password = self.password_entry.get().strip()
-            confirm = self.confirm_entry.get().strip()
-
-            if password != confirm:
-                messagebox.showerror("Erro", "As senhas não coincidem")
-                return
-
-            success, message = self.db.register_user(username, password)
-            
-            if success:
-                messagebox.showinfo("Sucesso", message)
-                self.destroy()
-            else:
-                messagebox.showerror("Erro", message)
-                
-        except Exception as e:
-            logging.error(f"Erro no processo de registro: {str(e)}")
-            messagebox.showerror("Erro", f"Falha crítica: {str(e)}")
-
     def _create_widgets(self):
         frame = tk.Frame(self, bg=self.config.BG_COLOR)
         frame.pack(padx=20, pady=20, fill='both', expand=True)
@@ -331,7 +285,7 @@ class Cadastro(tk.Toplevel):
     def _bind_events(self):
         self.bind('<Return>', self._executar_registro)
 
-    def _executar_registro(self, event=None):  # Novo nome
+    def _executar_registro(self, event=None):
         try:
             username = self.username_entry.get().strip()
             password = self.password_entry.get().strip()
