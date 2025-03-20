@@ -1,13 +1,13 @@
 import tkinter as tk
 from tkinter import messagebox
 import logging
-from db import UserDB
+from config import AppConfig  # Adicione esta linha
 
 class Cadastro(tk.Toplevel):
-    def __init__(self, master, db, config):
+    def __init__(self, master, db, config: AppConfig):  # Tipo explícito
         super().__init__(master)
-        self.db = db
-        self.config = config
+        self.config = config  # Adicione esta linha
+        # ... restante do código
         
         self.title("Cadastro de Usuário")
         self.geometry("300x250")

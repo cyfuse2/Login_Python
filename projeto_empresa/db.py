@@ -2,19 +2,13 @@ import sqlite3
 import hashlib
 import logging
 from dataclasses import dataclass
+from config import DatabaseConfig
 
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     filename='app.log'
 )
-
-@dataclass
-class DatabaseConfig:
-    DB_NAME: str = "users.db"
-    TABLE_NAME: str = "users"
-    MIN_USERNAME_LENGTH: int = 3
-    MIN_PASSWORD_LENGTH: int = 5
 
 class UserDB:
     def __init__(self, config: DatabaseConfig = DatabaseConfig()):

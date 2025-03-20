@@ -1,32 +1,16 @@
 import tkinter as tk
 from tkinter import messagebox
 import logging
-from dataclasses import dataclass
-from db import UserDB, DatabaseConfig, AuthManager
+from config import AppConfig
+from db import AuthManager
 from cadastro import Cadastro
+from menu import MainMenu
 
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     filename='app.log'
 )
-
-@dataclass
-class AppConfig:
-    WINDOW_TITLE: str = "Sistema de Login"
-    WINDOW_SIZE: str = "500x220"
-    BG_COLOR: str = '#333333'
-    TEXT_COLOR: str = '#FFFFFF'
-    BUTTON_BG: str = '#4CAF50'
-    ERROR_COLOR: str = '#FF0000'
-    FONT: str = "Arial"
-    FONT_SIZE: int = 12
-    TITLE_FONT_SIZE: int = 20
-    MIN_USERNAME_LENGTH: int = 3
-    MIN_PASSWORD_LENGTH: int = 5
-    LISTBOX_BG: str = '#444444'
-    LISTBOX_FG: str = '#FFFFFF'
-    LISTBOX_HIGHLIGHT: str = '#666666'
 
 class LoginScreen:
     def __init__(self, master: tk.Tk, db, config: AppConfig = AppConfig()):
@@ -36,7 +20,7 @@ class LoginScreen:
         self.auth = AuthManager(db)
         self._setup_window()
         self._create_widgets()
-        self._setup_autocomplete()  # ADICIONAR ESTA LINHA
+        self._setup_autocomplete()
         self._bind_events()
 
     def _setup_window(self) -> None:
@@ -276,17 +260,3 @@ class MainMenu(tk.Toplevel):
 
     def _on_close(self):
         self.master.destroy()  # Fecha completamente a aplicação
-
-def main() -> None:
-    root = tk.Tk()
-    config = AppConfig()
-    db_config = DatabaseConfig(
-        MIN_USERNAME_LENGTH=config.MIN_USERNAME_LENGTH,
-        MIN_PASSWORD_LENGTH=config.MIN_PASSWORD_LENGTH
-    )
-    db = UserDB(db_config)
-    LoginScreen(root, db, config)
-    root.mainloop()
-
-if __name__ == "__main__":
-    main()
