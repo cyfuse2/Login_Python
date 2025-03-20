@@ -1,0 +1,4 @@
+2025-03-20 15:27:03,403 - ERROR - Erro no login: name 'MainMenu' is not defined
+2025-03-20 15:27:55,898 - ERROR - Erro no login: name 'MainMenu' is not defined
+2025-03-20 15:30:20,111 - ERROR - Erro no login: LoginScreen._on_login_success() takes 1 positional argument but 2 were given
+2025-03-20 15:30:37,575 - ERROR - Erro no login: LoginScreen._on_login_success() takes 1 positional argument but 2 were given
