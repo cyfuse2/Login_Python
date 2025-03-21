@@ -4,10 +4,10 @@ import logging
 from config import AppConfig  # Adicione esta linha
 
 class Cadastro(tk.Toplevel):
-    def __init__(self, master, db, config: AppConfig):  # Tipo explícito
+    def __init__(self, master, db, config: AppConfig):
         super().__init__(master)
-        self.config = config  # Adicione esta linha
-        # ... restante do código
+        self.db = db  # ← Adicione esta linha crucial
+        self.config = config
         
         self.title("Cadastro de Usuário")
         self.geometry("300x250")

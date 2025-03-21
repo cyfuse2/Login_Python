@@ -5,3 +5,22 @@
 2025-03-20 15:36:55,521 - ERROR - Erro no login: name 'MainMenu' is not defined
 2025-03-20 15:38:30,922 - ERROR - Erro no login: LoginScreen._on_login_success() missing 1 required positional argument: 'username'
 2025-03-20 15:38:48,708 - ERROR - Erro no login: LoginScreen._on_login_success() missing 1 required positional argument: 'username'
+2025-03-20 18:01:42,773 - ERROR - Erro no login: MainMenu.__init__() takes 3 positional arguments but 4 were given
+2025-03-20 18:02:42,756 - ERROR - Erro no login: MainMenu.__init__() takes 3 positional arguments but 4 were given
+2025-03-20 18:25:02,410 - ERROR - Erro no login: MainMenu.__init__() takes 3 positional arguments but 4 were given
+2025-03-20 18:26:00,284 - ERROR - Erro no login: MainMenu.__init__() takes 3 positional arguments but 4 were given
+2025-03-20 18:33:21,762 - ERROR - Erro na validação: 'AuthManager' object has no attribute '_hash_password'
+2025-03-20 18:33:27,651 - ERROR - Erro na validação: 'AuthManager' object has no attribute '_hash_password'
+2025-03-20 18:33:38,615 - ERROR - Erro no registro: 'Cadastro' object has no attribute 'db'
+2025-03-20 18:34:40,049 - ERROR - Erro ao abrir menu: MainMenu.__init__() takes 3 positional arguments but 4 were given
+2025-03-20 18:35:16,875 - ERROR - Erro na validação: 'AuthManager' object has no attribute '_hash_password'
+2025-03-20 18:39:28,559 - ERROR - Erro ao abrir menu: MainMenu.__init__() takes 3 positional arguments but 4 were given
+2025-03-20 18:44:53,159 - ERROR - Erro no login: MainMenu.__init__() takes 3 positional arguments but 4 were given
+2025-03-20 18:49:06,360 - ERROR - Erro no login: MainMenu.__init__() takes 3 positional arguments but 4 were given
+2025-03-20 20:25:32,000 - ERROR - Erro ao carregar produtos: 'UserDB' object has no attribute 'get_all_products'
+2025-03-20 20:25:59,191 - ERROR - Erro ao carregar produtos: 'UserDB' object has no attribute 'get_all_products'
+2025-03-20 20:26:25,897 - ERROR - Erro ao carregar produtos: 'UserDB' object has no attribute 'get_all_products'
+2025-03-20 20:36:48,342 - ERROR - Erro ao carregar produtos: 'UserDB' object has no attribute 'get_all_products'
+2025-03-20 20:55:54,898 - ERROR - Erro na consulta: 'charmap' codec can't encode character '\U0001f50d' in position 2: character maps to <undefined>
+2025-03-20 21:08:59,803 - ERROR - Erro no registro: 'Cadastro' object has no attribute 'db'
+2025-03-20 21:09:19,510 - ERROR - Erro no registro: 'Cadastro' object has no attribute 'db'

@@ -1,15 +1,18 @@
 import tkinter as tk
 from tkinter import messagebox
 from config import AppConfig
+from produtos import CadastroProduto
+from consulta import ConsultaProdutos
 
 class MainMenu(tk.Toplevel):
-    def __init__(self, master, username: str):
+    def __init__(self, master, db, username: str):  # ← 3 parâmetros
         super().__init__(master)
+        self.db = db
         self.username = username
         self.config = AppConfig()
         self._setup_window()
         self._create_widgets()
-        
+
     def _setup_window(self):
         self.title("Sistema de Gestão")
         self.geometry("600x400")
@@ -54,13 +57,14 @@ class MainMenu(tk.Toplevel):
             btn.pack(pady=10, padx=10, side='top')
 
     def _open_cadastro(self):
-        messagebox.showinfo("Cadastro", "Funcionalidade de cadastro em desenvolvimento!")
+        CadastroProduto(self, self.db)
 
     def _open_consulta(self):
-        messagebox.showinfo("Consulta", "Funcionalidade de consulta em desenvolvimento!")
+        ConsultaProdutos(self, self.db)  # Substitua a messagebox por esta linha
 
     def _open_relatorio(self):
         messagebox.showinfo("Relatório", "Funcionalidade de relatório em desenvolvimento!")
 
     def _on_close(self):
-        self.master.destroy()
+        self.destroy()          # Fecha a janela do menu
+        self.master.deiconify() # Reexibe a janela principal (login)
